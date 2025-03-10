@@ -1,0 +1,29 @@
+trigger:
+- main  # Adjust as needed
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  ACR_NAME: 'rafaelreg'  # Ensure lowercase
+  IMAGE_NAME: 'gal-app'
+  TAG: 'latest'
+
+steps:
+- task: Docker@2
+  displayName: 'Build Docker Image'
+  inputs:
+    command: build
+    containerRegistry: 'RafaelReg'  # Replace with your actual service connection
+    dockerfile: 'Docker/Dockerfile'  # Ensure correct path
+    buildContext: 'Docker'           # Correct build context
+    repository: '$(ACR_NAME).azurecr.io/$(IMAGE_NAME)'
+    tags: '$(TAG)'
+
+- task: Docker@2
+  displayName: 'Push Docker Image to ACR'
+  inputs:
+    command: push
+    containerRegistry: 'RafaelReg'  # Required for pushing
+    repository: '$(ACR_NAME).azurecr.io/$(IMAGE_NAME)'
+    tags: '$(TAG)'
